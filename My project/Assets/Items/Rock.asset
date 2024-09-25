@@ -12,6 +12,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 5a09605c62b9bc541aef7b175a4c2f87, type: 3}
   m_Name: Rock
   m_EditorClassIdentifier: 
-  ItemId: 1
-  ItemIcon: {fileID: 0}
+  ItemId: 10
+  ItemIcon: {fileID: 21300000, guid: df273f0d0a801444281fb0d4d435f3ce, type: 3}
   MaxStackSize: 30
+  Drop: {fileID: 7462456472960799946, guid: 0676ba0c93df13c47a41a08807d623b1, type: 3}

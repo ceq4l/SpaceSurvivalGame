@@ -9,7 +9,7 @@ public class InventoryManager : MonoBehaviour
     public static InventoryManager instance;
 
     List<InventorySlot> Inventory = new List<InventorySlot>();
-    List<InventorySlot> Hotbar = new List<InventorySlot>();
+    public List<InventorySlot> Hotbar = new List<InventorySlot>();
 
     public List<StarterItem> StarterItems = new List<StarterItem>();
 
@@ -18,6 +18,7 @@ public class InventoryManager : MonoBehaviour
     [Header("Slot Holders UI")]
     public Transform InventorySlotHolder;
     public Transform HotbarSlotHolder;
+    public Transform DisplayHotbar;
 
     [Header("UI References")]
     public GameObject ItemUIPrefab;
@@ -102,6 +103,35 @@ public class InventoryManager : MonoBehaviour
         UIUpdate(Inventory);
         UIUpdate(Hotbar);
 
+        for (int i = 0; i < Hotbar.Count; i++)
+        {
+            InventorySlot Slot = Hotbar[i];
+            Transform SlotObject = DisplayHotbar.GetChild(i);
+
+            if (SlotObject.childCount > 0)
+                Destroy(SlotObject.GetChild(0).gameObject);
+
+            if (Slot.Item)
+            {
+                Transform NewItemUI = Instantiate(ItemUIPrefab, SlotObject).transform;
+
+                NewItemUI.GetComponent<Image>().sprite = Slot.Item.ItemIcon;
+
+                if (Slot.Item.ItemIcon)
+                {
+                    NewItemUI.GetChild(0).GetComponent<TMP_Text>().text = "";
+                    NewItemUI.GetChild(1).GetComponent<TMP_Text>().color = Color.white;
+                }
+                else
+                {
+                    NewItemUI.GetChild(0).GetComponent<TMP_Text>().text = Slot.Item.name;
+                    NewItemUI.GetChild(1).GetComponent<TMP_Text>().color = Color.black;
+                }
+
+                NewItemUI.GetChild(1).GetComponent<TMP_Text>().text = Slot.Amount.ToString();
+            }
+        }
+
         if (ItemBeingMoved.Item)
         {
             if (ItemBeingMoved.Item.ItemIcon)
@@ -157,7 +187,7 @@ public class InventoryManager : MonoBehaviour
     #endregion
 
     #region Inventory Management Events
-    void AddItem(ItemClass item, float amount, List<InventorySlot> List)
+    public void AddItem(ItemClass item, float amount, List<InventorySlot> List)
     {
         float AmountToAdd = amount;
 
@@ -171,7 +201,6 @@ public class InventoryManager : MonoBehaviour
                 {
                     slot.Amount += AmountToAdd;
                     AmountToAdd = 0;
-                    break;
                 }
                 else
                 {
@@ -193,7 +222,6 @@ public class InventoryManager : MonoBehaviour
                     slot.Amount += AmountToAdd;
 
                     AmountToAdd = 0;
-                    break;
                 }
                 else
                 {
@@ -204,6 +232,8 @@ public class InventoryManager : MonoBehaviour
                 }
             }
         }
+
+        UpdateInventoryUI();
 
         if (AmountToAdd > 0)
             Debug.Log("Drop " + item.name + " x" + AmountToAdd);

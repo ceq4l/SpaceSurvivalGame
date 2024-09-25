@@ -25,6 +25,13 @@ public class InteractionSystem : MonoBehaviour
         {
             if (InteractionObject.GetComponent<SupplyObject>())
                 InteractionObject.GetComponent<SupplyObject>().Interact();
+
+            if (InteractionObject.GetComponent<ItemPickup>())
+            {
+                InventoryManager.instance.AddItem(InteractionObject.GetComponent<ItemPickup>().Item, 1f, InventoryManager.instance.Hotbar);
+                Destroy(InteractionObject);
+            }
+                
         }
     }
 

@@ -9,9 +9,11 @@ MonoBehaviour:
   m_GameObject: {fileID: 0}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 5a09605c62b9bc541aef7b175a4c2f87, type: 3}
-  m_Name: Wood
+  m_Script: {fileID: 11500000, guid: 8c6b40acfdba84448af2c6662934d1c5, type: 3}
+  m_Name: MultiTool
   m_EditorClassIdentifier: 
-  ItemId: 2
+  ItemId: 20
   ItemIcon: {fileID: 0}
-  MaxStackSize: 30
+  MaxStackSize: 1
+  MaxDurability: 0
+  ViewModel: {fileID: 7333702393691462108, guid: 2f01b32a3228c5141b0a3dbb2de34770, type: 3}

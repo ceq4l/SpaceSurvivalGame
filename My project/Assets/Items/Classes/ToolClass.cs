@@ -6,6 +6,7 @@ using UnityEngine;
 public class ToolClass : ItemClass
 {
     public float MaxDurability;
+    public GameObject ViewModel;
 
     public override ToolClass GetTool() { return this; }
 }

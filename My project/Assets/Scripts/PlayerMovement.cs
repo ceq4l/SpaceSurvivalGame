@@ -13,10 +13,14 @@ public class PlayerMovement : MonoBehaviour
 
     Vector2 MoveVector;
     Vector2 LookVector;
+    float UpDown;
 
     float RotationX;
     Vector3 Velocity;
     bool isGrounded;
+    float currentSpeed;
+
+    public bool HasGravity;
 
     [Header("References")]
     public Camera Camera;
@@ -24,7 +28,8 @@ public class PlayerMovement : MonoBehaviour
 
     [Header("Movement Settings")]
     public float CameraSensitivity = 1.5f;
-    public float PlayerSpeed = 4f;
+    public float WalkingSpeed = 4f;
+    public float ZeroGSpeed = 4f;
     public float Gravity = -25f;
     public float JumpHeight = 1f;
 
@@ -34,6 +39,7 @@ public class PlayerMovement : MonoBehaviour
     [Header("Ground Check Settings")]
     public float GroundDistance = 0.2f;
     public LayerMask GroundMask;
+    public float PlatfromCheckDistance = 5f;
 
     private void Start()
     {
@@ -52,6 +58,13 @@ public class PlayerMovement : MonoBehaviour
         GetInput();
         MoveCamera();
         MovePlayer();
+
+        if (HasGravity)
+            currentSpeed = WalkingSpeed;
+        else
+            currentSpeed = ZeroGSpeed;
+
+        HasGravity = Physics.Raycast(transform.position, Vector3.down, PlatfromCheckDistance, GroundMask);
     }
 
     void GetInput()
@@ -65,7 +78,8 @@ public class PlayerMovement : MonoBehaviour
 
         //Get Input From Keyboard and Mouse
         LookVector = new Vector2(Input.GetAxisRaw("Mouse X") * CameraSensitivity, Input.GetAxisRaw("Mouse Y") * CameraSensitivity);
-        MoveVector = new Vector2(Input.GetAxisRaw("Horizontal"), Input.GetAxisRaw("Vertical"));
+        MoveVector = new Vector2(Input.GetAxisRaw("Horizontal"), Input.GetAxisRaw("Vertical")).normalized;
+        UpDown = Input.GetAxisRaw("UpDown");
     }
 
     void MovePlayer()
@@ -78,15 +92,23 @@ public class PlayerMovement : MonoBehaviour
 
         //Calculate Move direction and Move the Player
         Vector3 Direction = transform.right * MoveVector.x + transform.forward * MoveVector.y;
-        controller.Move(Direction * PlayerSpeed * Time.deltaTime);
+        controller.Move(Direction * currentSpeed * Time.deltaTime);
 
-        //Player Jump
-        if (Input.GetButtonDown("Jump") && isGrounded && !PauseInput)
-            Velocity.y = Mathf.Sqrt(JumpHeight * -2f * Gravity);
+        if (HasGravity)
+        {
+            //Player Jump
+            if (Input.GetButtonDown("Jump") && isGrounded && !PauseInput)
+                Velocity.y = Mathf.Sqrt(JumpHeight * -2f * Gravity);
 
-        //Gravity
-        Velocity.y += Gravity * Time.deltaTime;
-        controller.Move(Velocity * Time.deltaTime);
+            //Gravity
+            Velocity.y += Gravity * Time.deltaTime;
+            controller.Move(Velocity * Time.deltaTime);
+        }
+        else
+        {
+            controller.Move(transform.up * UpDown * currentSpeed * Time.deltaTime);
+            Velocity = Vector3.zero;
+        }
     }
 
     void MoveCamera()

@@ -7,6 +7,7 @@ public class MenuHandler : MonoBehaviour
     public static MenuHandler instance;
 
     public GameObject InventoryMenu;
+    public GameObject MainUI;
 
     private void Awake() { instance = this; }
 
@@ -24,6 +25,7 @@ public class MenuHandler : MonoBehaviour
             PlayerMovement.Instance.PauseInput = true;
 
             InventoryMenu.SetActive(true);
+            MainUI.SetActive(false);
         }
         else
         {
@@ -31,6 +33,7 @@ public class MenuHandler : MonoBehaviour
             PlayerMovement.Instance.PauseInput = false;
 
             InventoryMenu.SetActive(false);
+            MainUI.SetActive(true);
         }
     }
 }

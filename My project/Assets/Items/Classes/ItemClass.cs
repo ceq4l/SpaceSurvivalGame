@@ -8,4 +8,5 @@ public class ItemClass : ScriptableObject
 
     public virtual MiscClass GetMisc() { return null; }
     public virtual ToolClass GetTool() { return null; }
+    public virtual BuildClass GetBuild() { return null; }
 }

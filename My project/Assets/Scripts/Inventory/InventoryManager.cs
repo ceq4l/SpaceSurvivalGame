@@ -55,8 +55,6 @@ public class InventoryManager : MonoBehaviour
         {
             AddItem(StarterItems[i].Item, StarterItems[i].Amount, Inventory);
         }
-
-        UpdateInventoryUI();
     }
 
     private void Update()
@@ -108,8 +106,10 @@ public class InventoryManager : MonoBehaviour
             InventorySlot Slot = Hotbar[i];
             Transform SlotObject = DisplayHotbar.GetChild(i);
 
-            if (SlotObject.childCount > 0)
-                Destroy(SlotObject.GetChild(0).gameObject);
+            foreach (Transform child in SlotObject)
+            {
+                Destroy(child.gameObject);
+            }
 
             if (Slot.Item)
             {
@@ -160,8 +160,10 @@ public class InventoryManager : MonoBehaviour
             InventorySlot Slot = ItemList[i];
             Transform SlotObject = ItemList[i].SlotObject.transform;
 
-            if (SlotObject.childCount > 0)
-                Destroy(SlotObject.GetChild(0).gameObject);
+            foreach(Transform child in SlotObject)
+            {
+                Destroy(child.gameObject);
+            }
 
             if (Slot.Item)
             {
@@ -250,6 +252,38 @@ public class InventoryManager : MonoBehaviour
         ItemBeingMoved.Amount = 0;
         ItemBeingMoved.Durability = 0;
     }
+    public void ConsumeSelectedItem()
+    {
+        if (SelectedItem)
+        {
+            InventorySlot slot = Hotbar[SelectionIndex];
+
+            if (slot.Amount == 1)
+                ClearSlot(slot);
+            else
+                slot.Amount -= 1;
+
+            UpdateInventoryUI();
+        }
+    }
+    public bool Contains(ItemClass item, float amount)
+    {
+        float AmountFound = 0;
+
+        for (int i = 0; i < Inventory.Count; i++)
+        {
+            if (Inventory[i].Item == item)
+                AmountFound += Inventory[i].Amount;
+        }
+
+        for (int i = 0; i < Hotbar.Count; i++)
+        {
+            if (Hotbar[i].Item == item)
+                AmountFound += Hotbar[i].Amount;
+        }
+
+        return AmountFound >= amount;
+    }
     #endregion
 
     #region Move Events
@@ -332,13 +366,30 @@ public class InventoryManager : MonoBehaviour
         if (Slot.Item && Slot.Amount != Slot.Item.MaxStackSize && Slot.Item == ItemBeingMoved.Item)
         {
             Slot.Amount += 1;
-            ItemBeingMoved.Amount -= 1;
+
+            if (ItemBeingMoved.Amount > 1)
+                ItemBeingMoved.Amount -= 1;
+            else
+            {
+                ItemBeingMoved.Amount = 0;
+                ItemBeingMoved.Item = null;
+                ItemBeingMoved.Durability = 0;
+            }
+                
         }
         else if (!Slot.Item)
         {
             Slot.Item = ItemBeingMoved.Item;
             Slot.Amount += 1;
-            ItemBeingMoved.Amount -= 1;
+
+            if (ItemBeingMoved.Amount > 1)
+                ItemBeingMoved.Amount -= 1;
+            else
+            {
+                ItemBeingMoved.Amount = 0;
+                ItemBeingMoved.Item = null;
+                ItemBeingMoved.Durability = 0;
+            }
         }
 
         UpdateInventoryUI();
@@ -359,6 +410,47 @@ public class InventoryManager : MonoBehaviour
         }
 
         UpdateInventoryUI();
+    }
+    public void RemoveItem(ItemClass item, float amount)
+    {
+        float amountToRemove = amount;
+
+        for (int i = 0; i < Inventory.Count; i++)
+        {
+            if (Inventory[i].Item == item && amountToRemove > 0)
+            {
+                if (amountToRemove < Inventory[i].Amount)
+                {
+                    Inventory[i].Amount -= amountToRemove;
+                    amountToRemove = 0;
+                }
+                else
+                {
+                    amountToRemove -= Inventory[i].Amount;
+                    ClearSlot(Inventory[i]);
+                }
+            }
+        }
+
+        for (int i = 0; i < Hotbar.Count; i++)
+        {
+            if (Hotbar[i].Item == item && amountToRemove > 0)
+            {
+                if (amountToRemove <= Hotbar[i].Amount)
+                {
+                    Hotbar[i].Amount -= amountToRemove;
+                    amountToRemove = 0;
+                }
+                else
+                {
+                    amountToRemove -= Hotbar[i].Amount;
+                    ClearSlot(Hotbar[i]);
+                }
+            }
+        }
+
+        if (amountToRemove != 0)
+            Debug.Log(amountToRemove);
     }
     #endregion
 }

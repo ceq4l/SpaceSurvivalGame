@@ -1,5 +1,7 @@
+using Photon.Pun;
 using System.Collections;
 using System.Collections.Generic;
+using System.IO;
 using UnityEngine;
 
 public class BuildingSystem : MonoBehaviour
@@ -82,7 +84,7 @@ public class BuildingSystem : MonoBehaviour
     public void PlaceBuild()
     {
         InventoryManager.instance.ConsumeSelectedItem();
-        Instantiate(CurrentBuild.BuildPrefab, BuildPreview.transform.position, BuildPreview.transform.rotation, MainPlatform.transform);
+        PhotonNetwork.Instantiate(Path.Combine("PhotonPrefabs", "BuildPrefabs", CurrentBuild.name), BuildPreview.transform.position, BuildPreview.transform.rotation);
     }
 
     void UpdateBuilds()

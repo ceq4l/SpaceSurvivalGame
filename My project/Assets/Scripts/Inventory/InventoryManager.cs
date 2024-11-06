@@ -1,3 +1,4 @@
+using Photon.Pun;
 using System.Collections;
 using System.Collections.Generic;
 using TMPro;
@@ -31,7 +32,15 @@ public class InventoryManager : MonoBehaviour
     [HideInInspector]
     public MovingItem ItemBeingMoved;
 
-    private void Awake() { instance = this; }
+    private void Awake() 
+    {
+        PhotonView photonView = GetComponent<PhotonView>();
+
+        if (photonView.IsMine)
+            instance = this;
+        else
+            Destroy(this);
+    }
 
     private void Start()
     {
